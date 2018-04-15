@@ -10,7 +10,7 @@ import org.springframework.context.annotation.PropertySource;
  * Created by Alexey Smirnov 27.03.2018.
  */
 @Configuration
-@PropertySource("classpath:engbot.properties")
+@PropertySource("file:config/engbot.properties")
 @ComponentScan("ru.asmirnov.engbot")
 public class AppConfig {
 }

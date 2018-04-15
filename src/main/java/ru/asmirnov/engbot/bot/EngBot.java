@@ -36,7 +36,7 @@ public class EngBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        updateListener.onUpdateReceived(update);
+        updateListener.onUpdateReceived(update, this);
     }
 
     @Override

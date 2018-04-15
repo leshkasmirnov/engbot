@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="alexey.smirnov">
+        <createTable tableName="person">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ext_id" type="bigint">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" type="varchar(10)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="dictionary">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="original" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="translate" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="person_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mark" type="varchar(5)"/>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="person_id"
+                                 baseTableName="dictionary"
+                                 constraintName="fk_dictionary_person"
+                                 referencedColumnNames="id"
+                                 referencedTableName="person"/>
+        <createIndex indexName="idx_dictionary_person_id"
+                     tableName="dictionary"
+                     unique="false">
+            <column name="person_id" type="bigint"/>
+        </createIndex>
+        <createSequence incrementBy="1" sequenceName="dictionary_seq" startValue="1"/>
+        <createSequence incrementBy="1" sequenceName="person_seq" startValue="1"/>
+    </changeSet>
+</databaseChangeLog>
