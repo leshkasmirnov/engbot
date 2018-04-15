@@ -1,5 +1,6 @@
 package ru.asmirnov.engbot.db.repository.impl;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
@@ -57,7 +58,11 @@ public class PersonRepositoryImpl implements PersonRepository {
 
     @Override
     public Person findByExtId(Long extId) {
-        return jdbcTemplate.queryForObject("select id, ext_id, status from person where ext_id = ?",
-                personRowMapper, extId);
+        try {
+            return jdbcTemplate.queryForObject("select id, ext_id, status from person where ext_id = ?",
+                    personRowMapper, extId);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 }
