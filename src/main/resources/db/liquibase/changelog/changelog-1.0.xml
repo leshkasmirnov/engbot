@@ -16,6 +16,7 @@
             <column name="status" type="varchar(10)">
                 <constraints nullable="false"/>
             </column>
+            <column name="curr_dict_item_id" type="bigint"/>
         </createTable>
         <createTable tableName="dictionary">
             <column name="id" type="bigint">
@@ -24,9 +25,7 @@
             <column name="original" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="translate" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
+            <column name="translate" type="varchar(255)"/>
             <column name="person_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
@@ -37,10 +36,20 @@
                                  constraintName="fk_dictionary_person"
                                  referencedColumnNames="id"
                                  referencedTableName="person"/>
+        <addForeignKeyConstraint baseColumnNames="curr_dict_item_id"
+                                 baseTableName="person"
+                                 constraintName="fk_person_dictionary"
+                                 referencedColumnNames="id"
+                                 referencedTableName="dictionary"/>
         <createIndex indexName="idx_dictionary_person_id"
                      tableName="dictionary"
                      unique="false">
             <column name="person_id" type="bigint"/>
+        </createIndex>
+        <createIndex indexName="idx_person_dict_id"
+                     tableName="person"
+                     unique="false">
+            <column name="curr_dict_item_id" type="bigint"/>
         </createIndex>
         <createSequence incrementBy="1" sequenceName="dictionary_seq" startValue="1"/>
         <createSequence incrementBy="1" sequenceName="person_seq" startValue="1"/>

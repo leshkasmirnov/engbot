@@ -24,7 +24,7 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
             .original(rs.getString(2))
             .translate(rs.getString(3))
             .userId(rs.getLong(4))
-            .mark(DictionaryItemMark.valueOf(rs.getString(5)))
+            .mark(rs.getString(5) != null ? DictionaryItemMark.valueOf(rs.getString(5)) : null)
             .build();
 
     public DictionaryItemJdbcRepository(JdbcTemplate jdbcTemplate) {
@@ -38,7 +38,7 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
         final String q;
         if (model.getId() == null) {
             model.setId(sequence.nextLongValue());
-            q = "insert into dictionary (original, translate, person_id, mark, id) VALUES (?, ?, ?, ?)";
+            q = "insert into dictionary (original, translate, person_id, mark, id) VALUES (?, ?, ?, ?, ?)";
         } else {
             q = "update dictionary set original = ?, translate = ?, person_id = ?, mark = ? where id = ?";
         }

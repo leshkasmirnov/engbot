@@ -8,6 +8,7 @@ public class Person {
     private Long id;
     private Long extId;
     private PersonStatus status;
+    private Long currentDictionaryItemId;
 
     public Person(Long id, Long extId, PersonStatus status) {
         this.id = id;
@@ -39,10 +40,20 @@ public class Person {
         this.status = status;
     }
 
+    public Long getCurrentDictionaryItemId() {
+        return currentDictionaryItemId;
+    }
+
+    public void setCurrentDictionaryItemId(Long currentDictionaryItemId) {
+        this.currentDictionaryItemId = currentDictionaryItemId;
+    }
+
+
     public static final class PersonBuilder {
         private Long id;
         private Long extId;
         private PersonStatus status;
+        private Long currentDictionaryItemId;
 
         private PersonBuilder() {
         }
@@ -66,8 +77,15 @@ public class Person {
             return this;
         }
 
+        public PersonBuilder currentDictionaryItemId(Long currentDictionaryItemId) {
+            this.currentDictionaryItemId = currentDictionaryItemId;
+            return this;
+        }
+
         public Person build() {
-            return new Person(id, extId, status);
+            Person person = new Person(id, extId, status);
+            person.setCurrentDictionaryItemId(currentDictionaryItemId);
+            return person;
         }
     }
 }
