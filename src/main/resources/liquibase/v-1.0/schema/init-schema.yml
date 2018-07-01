@@ -1,0 +1,81 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: alexey.smirnov
+      changes:
+        - createTable:
+            tableName: person
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ext_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    uniquie: true
+              - column:
+                  name: status
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: curr_dict_item_id
+                  type: bigint
+        - createTable:
+            tableName: dictionary
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: original
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: translate
+                  type: varchar(255)
+              - column:
+                  name: person_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: mark
+                  type: varchar(5)
+        - addForeignKeyConstraint:
+            baseTableName: dictionary
+            baseColumnNames: person_id
+            constraintName: fk_dictionary_person
+            referencedColumnNames: id
+            referencedTableName: person
+        - addForeignKeyConstraint:
+            baseTableName: person
+            baseColumnNames: curr_dict_item_id
+            constraintName: fk_person_dictionary
+            referencedColumnNames: id
+            referencedTableName: dictionary
+        - createIndex:
+            indexName: idx_dictionary_person_id
+            tableName: dictionary
+            unique: false
+            column:
+              name: person_id
+              type: bigint
+        - createIndex:
+            indexName: idx_person_dict_id
+            tableName: person
+            unique: false
+            column:
+              name: curr_dict_item_id
+              type: bigint

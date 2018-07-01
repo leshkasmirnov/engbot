@@ -1,22 +1,37 @@
+buildscript {
+    ext {
+        springBootVersion = '2.0.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
 group 'ru.asmirnov'
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
+    gradleVersion = '4.8'
 }
 
 dependencies {
-    compile group: 'org.springframework', name: 'spring-context', version: '5.0.5.RELEASE'
-    compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.5.RELEASE'
-    compile group: 'com.zaxxer', name: 'HikariCP', version: '3.0.0'
+    compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+    compile("org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}")
+
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.2'
     compile group: 'org.liquibase', name: 'liquibase-core', version: '3.6.1'
     compile group: 'org.telegram', name: 'telegrambots', version: '3.6'

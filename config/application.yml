@@ -1,0 +1,16 @@
+engbot:
+  token: 521631126:AAFzfUXKfPOf63A7B32MKBShEN5HGYMADYA
+  #username: define your username here. By default: EngHelper
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/eng_bot
+    username: postgres
+    password: pwd
+    hikari:
+      connection-init-sql: SELECT 1
+      pool-name: EngBotDbPool
+      minimum-idle: 3
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
