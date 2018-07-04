@@ -10,5 +10,7 @@ public interface AnswerService {
 
     SendMessage getBlockedAnswer(Message message);
 
-    SendMessage getDefaultAnswer(Message message);
+    SendMessage getChoiceAnswer(Message message);
+
+    SendMessage getSavedAnswer(Message message);
 }

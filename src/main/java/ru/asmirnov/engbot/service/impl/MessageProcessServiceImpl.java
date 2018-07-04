@@ -54,8 +54,17 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         }
 
         if (person.getStatus() == PersonStatus.ACTIVE && message.isCommand()) {
-            Command command = Command.recognize(message.getText());
+            Command command;
+            try {
+                command = Command.recognize(message.getText());
+            } catch (IllegalArgumentException e) {
+                return answerService.getChoiceAnswer(message);
+            }
             return processCommand(person, message, command);
+        }
+
+        if (person.getStatus() == PersonStatus.ACTIVE && !message.isCommand()) {
+            return answerService.getChoiceAnswer(message);
         }
 
         return statusService.processStatus(person, message);
@@ -65,8 +74,11 @@ public class MessageProcessServiceImpl implements MessageProcessService {
         if (Command.ADD == command) {
             personService.setStatus(person, PersonStatus.ADD_ENG, Boolean.TRUE);
             return statusService.processStatus(person, message);
+        } else if (Command.START == command) {
+            personService.setStatus(person, PersonStatus.ONLINE, Boolean.TRUE);
+            return statusService.processStatus(person, message);
         }
-        return null;
+        return answerService.getChoiceAnswer(message);
     }
 
 }

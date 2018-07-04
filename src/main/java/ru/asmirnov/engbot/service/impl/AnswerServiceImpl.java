@@ -25,7 +25,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public SendMessage getDefaultAnswer(Message message) {
+    public SendMessage getChoiceAnswer(Message message) {
         SendMessage answer = createSendMessage(message, resourceBundle.getString("answers.default"));
 
         // Create a keyboard row
@@ -42,6 +42,11 @@ public class AnswerServiceImpl implements AnswerService {
         // Add it to the message
         answer.setReplyMarkup(keyboardMarkup);
         return answer;
+    }
+
+    @Override
+    public SendMessage getSavedAnswer(Message message) {
+        return createSendMessage(message, resourceBundle.getString("answers.saved"));
     }
 
     private SendMessage createSendMessage(Message message, String text) {

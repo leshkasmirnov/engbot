@@ -69,7 +69,9 @@ public class StatusServiceImpl implements StatusService {
 
             person.setCurrentDictionaryItemId(null);
             personService.setStatus(person, PersonStatus.ACTIVE, Boolean.FALSE);
-            return answerService.getDefaultAnswer(message);
+            return answerService.getSavedAnswer(message);
+        } else if (PersonStatus.ONLINE == person.getStatus()) {
+
         }
         return null;
     }

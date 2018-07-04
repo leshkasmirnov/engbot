@@ -18,7 +18,7 @@ import java.util.List;
  * @author Alexey Smirnov at 15/04/2018
  */
 @Repository
-public class PersonRepositoryImpl implements PersonRepository {
+public class PersonJdbcRepositoryImpl implements PersonRepository {
 
     private final JdbcTemplate jdbcTemplate;
     private final RowMapper<Person> personRowMapper = (rs, rowNum) -> Person.PersonBuilder.aPerson()
@@ -29,7 +29,7 @@ public class PersonRepositoryImpl implements PersonRepository {
             .build();
 
     @Autowired
-    public PersonRepositoryImpl(JdbcTemplate jdbcTemplate) {
+    public PersonJdbcRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
