@@ -13,16 +13,15 @@ public class Person {
     private Long extId;
     private PersonStatus status;
     private Long currentDictionaryItemId;
-    private Boolean statusRequested;
 
-    public Person(Long id, LocalDateTime created, LocalDateTime updated, Long extId, PersonStatus status, Long currentDictionaryItemId, Boolean statusRequested) {
+    public Person(Long id, LocalDateTime created, LocalDateTime updated, Long extId, PersonStatus status,
+                  Long currentDictionaryItemId) {
         this.id = id;
         this.created = created;
         this.updated = updated;
         this.extId = extId;
         this.status = status;
         this.currentDictionaryItemId = currentDictionaryItemId;
-        this.statusRequested = statusRequested;
     }
 
     public Long getId() {
@@ -55,14 +54,6 @@ public class Person {
 
     public void setCurrentDictionaryItemId(Long currentDictionaryItemId) {
         this.currentDictionaryItemId = currentDictionaryItemId;
-    }
-
-    public Boolean getStatusRequested() {
-        return statusRequested;
-    }
-
-    public void setStatusRequested(Boolean statusRequested) {
-        this.statusRequested = statusRequested;
     }
 
     public LocalDateTime getCreated() {
@@ -133,7 +124,7 @@ public class Person {
         }
 
         public Person build() {
-            return new Person(id, created, updated, extId, status, currentDictionaryItemId, statusRequested);
+            return new Person(id, created, updated, extId, status, currentDictionaryItemId);
         }
     }
 }

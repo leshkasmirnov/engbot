@@ -39,9 +39,9 @@ public class PersonJdbcRepositoryImpl implements PersonRepository {
         boolean insert = person.getId() == null;
 
         if (insert) {
-            q = "insert into person (ext_id, status, curr_dict_item_id, status_requested) VALUES (?,?,?,?)";
+            q = "insert into person (ext_id, status, curr_dict_item_id) VALUES (?,?,?)";
         } else {
-            q = "update person set ext_id = ?, status = ?, curr_dict_item_id = ?, status_requested = ? where id = ?";
+            q = "update person set ext_id = ?, status = ?, curr_dict_item_id = ? where id = ?";
         }
 
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
@@ -51,9 +51,8 @@ public class PersonJdbcRepositoryImpl implements PersonRepository {
             ps.setObject(1, person.getExtId());
             ps.setString(2, person.getStatus().name());
             ps.setObject(3, person.getCurrentDictionaryItemId());
-            ps.setObject(4, person.getStatusRequested());
             if (!insert) {
-                ps.setLong(5, person.getId());
+                ps.setLong(4, person.getId());
             }
             return ps;
         }, generatedKeyHolder);

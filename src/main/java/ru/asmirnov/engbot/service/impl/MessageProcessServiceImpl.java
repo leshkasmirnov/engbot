@@ -4,13 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import ru.asmirnov.engbot.db.domain.Command;
 import ru.asmirnov.engbot.db.domain.Person;
 import ru.asmirnov.engbot.db.domain.PersonStatus;
 import ru.asmirnov.engbot.db.repository.PersonRepository;
-import ru.asmirnov.engbot.service.AnswerService;
 import ru.asmirnov.engbot.service.MessageProcessService;
-import ru.asmirnov.engbot.service.PersonService;
 import ru.asmirnov.engbot.service.StatusService;
 
 /**
@@ -21,17 +18,11 @@ import ru.asmirnov.engbot.service.StatusService;
 public class MessageProcessServiceImpl implements MessageProcessService {
 
     private final PersonRepository personRepository;
-    private final PersonService personService;
-    private final AnswerService answerService;
     private final StatusService statusService;
 
     @Autowired
-    public MessageProcessServiceImpl(PersonRepository personRepository, PersonService personService,
-                                     AnswerService answerService,
-                                     StatusService statusService) {
+    public MessageProcessServiceImpl(PersonRepository personRepository, StatusService statusService) {
         this.personRepository = personRepository;
-        this.personService = personService;
-        this.answerService = answerService;
         this.statusService = statusService;
     }
 
@@ -48,37 +39,7 @@ public class MessageProcessServiceImpl implements MessageProcessService {
                             .build()
             );
         }
-
-        if (person.getStatus() == PersonStatus.BLOCKED) {
-            return answerService.getBlockedAnswer(message);
-        }
-
-        if (person.getStatus() == PersonStatus.ACTIVE && message.isCommand()) {
-            Command command;
-            try {
-                command = Command.recognize(message.getText());
-            } catch (IllegalArgumentException e) {
-                return answerService.getChoiceAnswer(message);
-            }
-            return processCommand(person, message, command);
-        }
-
-        if (person.getStatus() == PersonStatus.ACTIVE && !message.isCommand()) {
-            return answerService.getChoiceAnswer(message);
-        }
-
         return statusService.processStatus(person, message);
-    }
-
-    private SendMessage processCommand(Person person, Message message, Command command) {
-        if (Command.ADD == command) {
-            personService.setStatus(person, PersonStatus.ADD_ENG, Boolean.TRUE);
-            return statusService.processStatus(person, message);
-        } else if (Command.START == command) {
-            personService.setStatus(person, PersonStatus.ONLINE, Boolean.TRUE);
-            return statusService.processStatus(person, message);
-        }
-        return answerService.getChoiceAnswer(message);
     }
 
 }

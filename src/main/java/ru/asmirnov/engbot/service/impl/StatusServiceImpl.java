@@ -1,15 +1,18 @@
 package ru.asmirnov.engbot.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
+import ru.asmirnov.engbot.db.domain.Command;
 import ru.asmirnov.engbot.db.domain.DictionaryItem;
 import ru.asmirnov.engbot.db.domain.Person;
 import ru.asmirnov.engbot.db.domain.PersonStatus;
 import ru.asmirnov.engbot.db.repository.DictionaryItemRepository;
 import ru.asmirnov.engbot.service.AnswerService;
+import ru.asmirnov.engbot.service.CommandService;
 import ru.asmirnov.engbot.service.PersonService;
 import ru.asmirnov.engbot.service.StatusService;
 
@@ -21,63 +24,64 @@ import java.util.ResourceBundle;
 @Service
 public class StatusServiceImpl implements StatusService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StatusServiceImpl.class);
+
     private final ResourceBundle resourceBundle = ResourceBundle.getBundle("answerMessages");
 
     private final DictionaryItemRepository dictionaryItemRepository;
     private final PersonService personService;
     private final AnswerService answerService;
-    private StatusService statusService;
+    private final CommandService commandService;
 
     @Autowired
     public StatusServiceImpl(DictionaryItemRepository dictionaryItemRepository, PersonService personService,
-                             AnswerService answerService) {
+                             AnswerService answerService, CommandService commandService) {
         this.dictionaryItemRepository = dictionaryItemRepository;
         this.personService = personService;
         this.answerService = answerService;
+        this.commandService = commandService;
     }
 
     @Override
-    @Transactional
     public SendMessage processStatus(Person person, Message message) {
-        if (PersonStatus.ADD_ENG == person.getStatus()) {
-            if (Boolean.TRUE.equals(person.getStatusRequested())) {
-                return new SendMessage(message.getChatId(), resourceBundle.getString("answers.enter.english"));
+        if (person.getStatus() == PersonStatus.BLOCKED) {
+            return answerService.getBlockedAnswer(message);
+        }
+
+        if (person.getStatus() == PersonStatus.ACTIVE) {
+            if (message.isCommand()) {
+                try {
+                    Command command = Command.recognize(message.getText());
+                    return commandService.processCommand(command, person, message);
+                } catch (IllegalArgumentException e) {
+                    LOGGER.warn("Command {} has not recognized", message.getText());
+                }
             }
+            return answerService.getChoiceAnswer(message);
+        }
+
+        if (PersonStatus.ADD_ENG == person.getStatus()) {
             // save english
             DictionaryItem dictionaryItem = DictionaryItem.DictionaryItemBuilder
                     .aDictionaryItem()
                     .original(message.getText())
                     .userId(person.getId())
                     .build();
-            dictionaryItem = dictionaryItemRepository.save(dictionaryItem);
-
-            person.setCurrentDictionaryItemId(dictionaryItem.getId());
-            personService.setStatus(person, PersonStatus.ADD_RUS, Boolean.TRUE);
-            return statusService.processStatus(person, message);
+            personService.saveOriginalDictionaryItem(person, dictionaryItem);
+            return new SendMessage(message.getChatId(), resourceBundle.getString("answers.enter.russian"));
         } else if (PersonStatus.ADD_RUS == person.getStatus()) {
-            if (Boolean.TRUE.equals(person.getStatusRequested())) {
-                return new SendMessage(message.getChatId(), resourceBundle.getString("answers.enter.russian"));
-            }
-
             // save translate
             if (person.getCurrentDictionaryItemId() == null) {
                 throw new RuntimeException("Current Dictionary item id is null");
             }
-            DictionaryItem dictionaryItem = dictionaryItemRepository.findById(person.getCurrentDictionaryItemId());
-            dictionaryItem.setTranslate(message.getText());
-            dictionaryItemRepository.save(dictionaryItem);
 
-            person.setCurrentDictionaryItemId(null);
-            personService.setStatus(person, PersonStatus.ACTIVE, Boolean.FALSE);
+            DictionaryItem dictionaryItem = dictionaryItemRepository.findById(person.getCurrentDictionaryItemId());
+            personService.saveDictionaryItemTranslate(person, dictionaryItem, message.getText());
+
             return answerService.getSavedAnswer(message);
         } else if (PersonStatus.ONLINE == person.getStatus()) {
 
         }
         return null;
-    }
-
-    @Autowired
-    public void setStatusService(StatusService statusService) {
-        this.statusService = statusService;
     }
 }

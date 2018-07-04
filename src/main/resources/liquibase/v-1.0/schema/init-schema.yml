@@ -43,12 +43,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: status_requested
-                  type: boolean
-                  remarks: Current person status requested flag. If true - message requested, otherwise response received.
-                  constraints:
-                    nullable: false
-              - column:
                   name: curr_dict_item_id
                   type: bigint
                   remarks: Current word id from dictionary
