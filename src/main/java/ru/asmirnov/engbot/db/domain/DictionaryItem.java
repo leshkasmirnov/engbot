@@ -1,18 +1,22 @@
 package ru.asmirnov.engbot.db.domain;
 
+import java.time.LocalDateTime;
+
 /**
  * @author Alexey Smirnov at 15/04/2018
  */
 public class DictionaryItem {
 
     private Long id;
+    private LocalDateTime created;
     private String original;
     private String translate;
     private Long userId;
     private DictionaryItemMark mark;
 
-    public DictionaryItem(Long id, String original, String translate, Long userId, DictionaryItemMark mark) {
+    public DictionaryItem(Long id, LocalDateTime created, String original, String translate, Long userId, DictionaryItemMark mark) {
         this.id = id;
+        this.created = created;
         this.original = original;
         this.translate = translate;
         this.userId = userId;
@@ -60,8 +64,18 @@ public class DictionaryItem {
     }
 
 
+    public LocalDateTime getCreated() {
+        return created;
+    }
+
+    public void setCreated(LocalDateTime created) {
+        this.created = created;
+    }
+
+
     public static final class DictionaryItemBuilder {
         private Long id;
+        private LocalDateTime created;
         private String original;
         private String translate;
         private Long userId;
@@ -76,6 +90,11 @@ public class DictionaryItem {
 
         public DictionaryItemBuilder id(Long id) {
             this.id = id;
+            return this;
+        }
+
+        public DictionaryItemBuilder created(LocalDateTime created) {
+            this.created = created;
             return this;
         }
 
@@ -100,7 +119,7 @@ public class DictionaryItem {
         }
 
         public DictionaryItem build() {
-            return new DictionaryItem(id, original, translate, userId, mark);
+            return new DictionaryItem(id, created, original, translate, userId, mark);
         }
     }
 }

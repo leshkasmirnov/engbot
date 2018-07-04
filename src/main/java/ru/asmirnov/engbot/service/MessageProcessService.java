@@ -6,7 +6,7 @@ import org.telegram.telegrambots.api.objects.Message;
 /**
  * @author Alexey Smirnov at 15/04/2018
  */
-public interface ReplyService {
+public interface MessageProcessService {
 
     SendMessage reply(Message message);
 }

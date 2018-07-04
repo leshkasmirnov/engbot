@@ -2,12 +2,13 @@ package ru.asmirnov.engbot.db.repository.impl;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.asmirnov.engbot.db.domain.DictionaryItem;
 import ru.asmirnov.engbot.db.domain.DictionaryItemMark;
 import ru.asmirnov.engbot.db.repository.DictionaryItemRepository;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 /**
@@ -17,7 +18,6 @@ import java.util.List;
 public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final PostgresSequenceMaxValueIncrementer sequence;
     private final RowMapper<DictionaryItem> dictionaryRowMapper = (rs, rowNum) -> DictionaryItem.DictionaryItemBuilder
             .aDictionaryItem()
             .id(rs.getLong(1))
@@ -29,24 +29,34 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
 
     public DictionaryItemJdbcRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.sequence = new PostgresSequenceMaxValueIncrementer(jdbcTemplate.getDataSource(),
-                "dictionary_seq");
     }
 
     @Override
     public DictionaryItem save(final DictionaryItem model) {
         final String q;
-        if (model.getId() == null) {
-            model.setId(sequence.nextLongValue());
-            q = "insert into dictionary (original, translate, person_id, mark, id) VALUES (?, ?, ?, ?, ?)";
+        boolean insert = model.getId() == null;
+
+        if (insert) {
+            q = "insert into dictionary (original, translate, person_id, mark) VALUES (?, ?, ?, ?)";
         } else {
             q = "update dictionary set original = ?, translate = ?, person_id = ?, mark = ? where id = ?";
         }
-        jdbcTemplate.update(q, model.getOriginal(),
-                model.getTranslate(),
-                model.getUserId(),
-                model.getMark(),
-                model.getId());
+
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(q, new String[]{"id"});
+
+            ps.setString(1, model.getOriginal());
+            ps.setString(2, model.getTranslate());
+            ps.setObject(3, model.getUserId());
+            ps.setString(4, model.getMark() != null ? model.getMark().name() : null);
+            if (!insert) {
+                ps.setLong(5, model.getId());
+            }
+            return ps;
+        }, generatedKeyHolder);
+
+        model.setId((Long) generatedKeyHolder.getKey());
         return model;
     }
 

@@ -4,13 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.incrementer.PostgresSequenceMaxValueIncrementer;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.asmirnov.engbot.db.domain.Person;
 import ru.asmirnov.engbot.db.domain.PersonStatus;
 import ru.asmirnov.engbot.db.repository.PersonRepository;
 import ru.asmirnov.engbot.util.JdbsUtils;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 /**
@@ -20,7 +21,6 @@ import java.util.List;
 public class PersonRepositoryImpl implements PersonRepository {
 
     private final JdbcTemplate jdbcTemplate;
-    private final PostgresSequenceMaxValueIncrementer sequence;
     private final RowMapper<Person> personRowMapper = (rs, rowNum) -> Person.PersonBuilder.aPerson()
             .id(rs.getLong(1))
             .extId(rs.getLong(2))
@@ -31,21 +31,34 @@ public class PersonRepositoryImpl implements PersonRepository {
     @Autowired
     public PersonRepositoryImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.sequence = new PostgresSequenceMaxValueIncrementer(jdbcTemplate.getDataSource(),
-                "person_seq");
     }
 
     @Override
     public Person save(Person person) {
         final String q;
-        if (person.getId() == null) {
-            person.setId(sequence.nextLongValue());
-            q = "insert into person (ext_id, status, curr_dict_item_id, id) VALUES (?,?,?,?)";
+        boolean insert = person.getId() == null;
+
+        if (insert) {
+            q = "insert into person (ext_id, status, curr_dict_item_id, status_requested) VALUES (?,?,?,?)";
         } else {
-            q = "update person set ext_id = ?, status = ?, curr_dict_item_id = ? where id = ?";
+            q = "update person set ext_id = ?, status = ?, curr_dict_item_id = ?, status_requested = ? where id = ?";
         }
-        jdbcTemplate.update(q, person.getExtId(), person.getStatus().toString(),
-                person.getCurrentDictionaryItemId(), person.getId());
+
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(q, new String[]{"id"});
+
+            ps.setObject(1, person.getExtId());
+            ps.setString(2, person.getStatus().name());
+            ps.setObject(3, person.getCurrentDictionaryItemId());
+            ps.setObject(4, person.getStatusRequested());
+            if (!insert) {
+                ps.setLong(5, person.getId());
+            }
+            return ps;
+        }, generatedKeyHolder);
+
+        person.setId((Long) generatedKeyHolder.getKey());
         return person;
     }
 

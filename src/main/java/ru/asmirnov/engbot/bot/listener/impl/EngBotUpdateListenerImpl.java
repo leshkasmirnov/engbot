@@ -8,7 +8,7 @@ import org.telegram.telegrambots.api.objects.Update;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
 import ru.asmirnov.engbot.bot.listener.UpdateListener;
-import ru.asmirnov.engbot.service.ReplyService;
+import ru.asmirnov.engbot.service.MessageProcessService;
 
 /**
  * Eng bot update listener. Listen for new messages.
@@ -21,9 +21,9 @@ public class EngBotUpdateListenerImpl implements UpdateListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EngBotUpdateListenerImpl.class);
 
-    private final ReplyService replyService;
+    private final MessageProcessService replyService;
 
-    public EngBotUpdateListenerImpl(ReplyService replyService) {
+    public EngBotUpdateListenerImpl(MessageProcessService replyService) {
         this.replyService = replyService;
     }
 

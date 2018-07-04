@@ -5,54 +5,92 @@ databaseChangeLog:
       changes:
         - createTable:
             tableName: person
+            remarks: Users
             columns:
               - column:
                   name: id
                   type: bigint
                   autoIncrement: true
+                  remarks: Primary key
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: ext_id
-                  type: bigint
+                  name: created
+                  type: timestamp
+                  remarks: Created timestamp
                   constraints:
                     nullable: false
-                    uniquie: true
+                  defaultValueComputed: current_timestamp()
+              - column:
+                  name: updated
+                  type: timestamp
+                  remarks: Last updated timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: current_timestamp()
+              - column:
+                  name: ext_id
+                  type: bigint
+                  remarks: External person key
+                  constraints:
+                    nullable: false
+                    unique: true
               - column:
                   name: status
                   type: varchar(10)
+                  remarks: Current person status
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status_requested
+                  type: boolean
+                  remarks: Current person status requested flag. If true - message requested, otherwise response received.
                   constraints:
                     nullable: false
               - column:
                   name: curr_dict_item_id
                   type: bigint
+                  remarks: Current word id from dictionary
         - createTable:
             tableName: dictionary
+            remarks: Dictionary
             columns:
               - column:
                   name: id
                   type: bigint
                   autoIncrement: true
+                  remarks: Primary key
                   constraints:
                     primaryKey: true
                     nullable: false
               - column:
+                  name: created
+                  type: timestamp
+                  remarks: Created timestamp
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: current_timestamp()
+              - column:
                   name: original
                   type: varchar(255)
+                  remarks: Original word
                   constraints:
                     nullable: false
               - column:
                   name: translate
                   type: varchar(255)
+                  remarks: Translate
               - column:
                   name: person_id
                   type: bigint
+                  remarks: Reference to person
                   constraints:
                     nullable: false
               - column:
                   name: mark
                   type: varchar(5)
+                  remarks: Mark
         - addForeignKeyConstraint:
             baseTableName: dictionary
             baseColumnNames: person_id
