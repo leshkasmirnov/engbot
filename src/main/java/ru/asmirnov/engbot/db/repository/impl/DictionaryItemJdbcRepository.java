@@ -1,13 +1,14 @@
 package ru.asmirnov.engbot.db.repository.impl;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.asmirnov.engbot.db.domain.DictionaryItem;
 import ru.asmirnov.engbot.db.domain.Person;
-import ru.asmirnov.engbot.enums.DictionaryItemMark;
 import ru.asmirnov.engbot.db.repository.DictionaryItemRepository;
+import ru.asmirnov.engbot.enums.DictionaryItemMark;
 import ru.asmirnov.engbot.enums.DictionaryItemStatus;
 
 import java.sql.PreparedStatement;
@@ -40,7 +41,7 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
         boolean insert = model.getId() == null;
 
         if (insert) {
-            q = "insert into dictionary (original, translate, person_id, mark, status) VALUES (?, ?, ?, ?)";
+            q = "insert into dictionary (original, translate, person_id, mark, status) VALUES (?, ?, ?, ?, ?)";
         } else {
             q = "update dictionary set original = ?, translate = ?, person_id = ?, mark = ?, status = ? where id = ?";
         }
@@ -84,14 +85,18 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
 
     @Override
     public DictionaryItem findRandom(Long personId, DictionaryItemStatus status) {
-        return jdbcTemplate.queryForObject("select id, original, translate, person_id, mark, status from dictionary" +
-                        " where person_id = ? and STATUS = ? ORDER BY random() LIMIT 1",
-                dictionaryRowMapper, personId, status);
+        try {
+            return jdbcTemplate.queryForObject("select id, original, translate, person_id, mark, status from dictionary" +
+                            " where person_id = ? and STATUS = ? ORDER BY random() LIMIT 1",
+                    dictionaryRowMapper, personId, status.name());
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override
     public void setUnPassedByPerson(Person person) {
         jdbcTemplate.update("update dictionary set status = ? where status = ? and person_id = ?",
-                DictionaryItemStatus.READY, DictionaryItemStatus.PASSED, person.getId());
+                DictionaryItemStatus.READY.name(), DictionaryItemStatus.PASSED.name(), person.getId());
     }
 }

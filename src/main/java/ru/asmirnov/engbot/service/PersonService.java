@@ -8,4 +8,6 @@ public interface PersonService {
     void saveOriginalDictionaryItem(Person person, DictionaryItem dictionaryItem);
 
     void saveDictionaryItemTranslate(Person person, DictionaryItem dictionaryItem, String translate);
+
+    void finishTraining(Person person);
 }

@@ -11,6 +11,7 @@ import ru.asmirnov.engbot.db.repository.PersonRepository;
 import ru.asmirnov.engbot.enums.DictionaryItemMark;
 import ru.asmirnov.engbot.enums.DictionaryItemStatus;
 import ru.asmirnov.engbot.enums.DictionaryItemType;
+import ru.asmirnov.engbot.service.PersonService;
 import ru.asmirnov.engbot.service.TrainingService;
 
 import java.text.MessageFormat;
@@ -28,18 +29,19 @@ public class TrainingServiceImpl implements TrainingService {
 
     private final DictionaryItemRepository dictionaryItemRepository;
     private final PersonRepository personRepository;
+    private final PersonService personService;
 
-    public TrainingServiceImpl(DictionaryItemRepository dictionaryItemRepository, PersonRepository personRepository) {
+    public TrainingServiceImpl(DictionaryItemRepository dictionaryItemRepository, PersonRepository personRepository, PersonService personService) {
         this.dictionaryItemRepository = dictionaryItemRepository;
         this.personRepository = personRepository;
+        this.personService = personService;
     }
 
     @Override
     public SendMessage getNextDictionaryItem(Person person, Message message) {
         DictionaryItem dictionaryItem = dictionaryItemRepository.findRandom(person.getId(), DictionaryItemStatus.READY);
         if (dictionaryItem == null) {
-            dictionaryItemRepository.setUnPassedByPerson(person);
-            // then training finished. return message
+            personService.finishTraining(person);
             return new SendMessage(message.getChatId(), resourceBundle.getString("answers.training.finished"));
         }
 

@@ -43,4 +43,12 @@ public class PersonServiceImpl implements PersonService {
         person.setStatus(PersonStatus.ACTIVE);
         personRepository.save(person);
     }
+
+    @Override
+    @Transactional
+    public void finishTraining(Person person) {
+        person.setStatus(PersonStatus.ACTIVE);
+        dictionaryItemRepository.setUnPassedByPerson(person);
+        personRepository.save(person);
+    }
 }
