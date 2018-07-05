@@ -46,6 +46,10 @@ databaseChangeLog:
                   name: curr_dict_item_id
                   type: bigint
                   remarks: Current word id from dictionary
+              - column:
+                  name: curr_dict_item_type
+                  type: varchar(10)
+                  remarks: Current word type from dictionary (original or translate)
         - createTable:
             tableName: dictionary
             remarks: Dictionary
@@ -81,6 +85,10 @@ databaseChangeLog:
                   remarks: Reference to person
                   constraints:
                     nullable: false
+              - column:
+                  name: status
+                  type: varchar(10)
+                  remarks: Status
               - column:
                   name: mark
                   type: varchar(5)

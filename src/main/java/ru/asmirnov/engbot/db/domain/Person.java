@@ -1,5 +1,8 @@
 package ru.asmirnov.engbot.db.domain;
 
+import ru.asmirnov.engbot.enums.DictionaryItemType;
+import ru.asmirnov.engbot.enums.PersonStatus;
+
 import java.time.LocalDateTime;
 
 /**
@@ -13,15 +16,17 @@ public class Person {
     private Long extId;
     private PersonStatus status;
     private Long currentDictionaryItemId;
+    private DictionaryItemType currentDictionaryItemType;
 
     public Person(Long id, LocalDateTime created, LocalDateTime updated, Long extId, PersonStatus status,
-                  Long currentDictionaryItemId) {
+                  Long currentDictionaryItemId, DictionaryItemType currentDictionaryItemType) {
         this.id = id;
         this.created = created;
         this.updated = updated;
         this.extId = extId;
         this.status = status;
         this.currentDictionaryItemId = currentDictionaryItemId;
+        this.currentDictionaryItemType = currentDictionaryItemType;
     }
 
     public Long getId() {
@@ -72,6 +77,15 @@ public class Person {
         this.updated = updated;
     }
 
+    public DictionaryItemType getCurrentDictionaryItemType() {
+        return currentDictionaryItemType;
+    }
+
+    public void setCurrentDictionaryItemType(DictionaryItemType currentDictionaryItemType) {
+        this.currentDictionaryItemType = currentDictionaryItemType;
+    }
+
+
     public static final class PersonBuilder {
         private Long id;
         private LocalDateTime created;
@@ -79,7 +93,7 @@ public class Person {
         private Long extId;
         private PersonStatus status;
         private Long currentDictionaryItemId;
-        private Boolean statusRequested;
+        private DictionaryItemType currentDictionaryItemType;
 
         private PersonBuilder() {
         }
@@ -118,13 +132,13 @@ public class Person {
             return this;
         }
 
-        public PersonBuilder statusRequested(Boolean statusRequested) {
-            this.statusRequested = statusRequested;
+        public PersonBuilder currentDictionaryItemType(DictionaryItemType currentDictionaryItemType) {
+            this.currentDictionaryItemType = currentDictionaryItemType;
             return this;
         }
 
         public Person build() {
-            return new Person(id, created, updated, extId, status, currentDictionaryItemId);
+            return new Person(id, created, updated, extId, status, currentDictionaryItemId, currentDictionaryItemType);
         }
     }
 }

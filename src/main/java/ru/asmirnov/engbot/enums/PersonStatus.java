@@ -1,4 +1,4 @@
-package ru.asmirnov.engbot.db.domain;
+package ru.asmirnov.engbot.enums;
 
 public enum PersonStatus {
 

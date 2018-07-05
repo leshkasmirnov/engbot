@@ -5,8 +5,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.asmirnov.engbot.db.domain.DictionaryItem;
-import ru.asmirnov.engbot.db.domain.DictionaryItemMark;
+import ru.asmirnov.engbot.db.domain.Person;
+import ru.asmirnov.engbot.enums.DictionaryItemMark;
 import ru.asmirnov.engbot.db.repository.DictionaryItemRepository;
+import ru.asmirnov.engbot.enums.DictionaryItemStatus;
 
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -25,6 +27,7 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
             .translate(rs.getString(3))
             .userId(rs.getLong(4))
             .mark(rs.getString(5) != null ? DictionaryItemMark.valueOf(rs.getString(5)) : null)
+            .status(rs.getString(6) != null ? DictionaryItemStatus.valueOf(rs.getString(6)) : null)
             .build();
 
     public DictionaryItemJdbcRepository(JdbcTemplate jdbcTemplate) {
@@ -37,9 +40,9 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
         boolean insert = model.getId() == null;
 
         if (insert) {
-            q = "insert into dictionary (original, translate, person_id, mark) VALUES (?, ?, ?, ?)";
+            q = "insert into dictionary (original, translate, person_id, mark, status) VALUES (?, ?, ?, ?)";
         } else {
-            q = "update dictionary set original = ?, translate = ?, person_id = ?, mark = ? where id = ?";
+            q = "update dictionary set original = ?, translate = ?, person_id = ?, mark = ?, status = ? where id = ?";
         }
 
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
@@ -50,8 +53,9 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
             ps.setString(2, model.getTranslate());
             ps.setObject(3, model.getUserId());
             ps.setString(4, model.getMark() != null ? model.getMark().name() : null);
+            ps.setString(5, model.getStatus() != null ? model.getStatus().name() : null);
             if (!insert) {
-                ps.setLong(5, model.getId());
+                ps.setLong(6, model.getId());
             }
             return ps;
         }, generatedKeyHolder);
@@ -62,19 +66,32 @@ public class DictionaryItemJdbcRepository implements DictionaryItemRepository {
 
     @Override
     public DictionaryItem findById(Long id) {
-        return jdbcTemplate.queryForObject("select id, original, translate, person_id, mark from dictionary where id = ?",
+        return jdbcTemplate.queryForObject("select id, original, translate, person_id, mark, status from dictionary where id = ?",
                 dictionaryRowMapper, id);
     }
 
     @Override
     public List<DictionaryItem> findAll() {
-        return jdbcTemplate.query("select id, original, translate, person_id, mark from dictionary",
+        return jdbcTemplate.query("select id, original, translate, person_id, mark, status from dictionary",
                 dictionaryRowMapper);
     }
 
     @Override
     public List<DictionaryItem> findByPersonId(Long personId) {
-        return jdbcTemplate.query("select id, original, translate, person_id, mark from dictionary where person_id = ?",
+        return jdbcTemplate.query("select id, original, translate, person_id, mark, status from dictionary where person_id = ?",
                 dictionaryRowMapper, personId);
+    }
+
+    @Override
+    public DictionaryItem findRandom(Long personId, DictionaryItemStatus status) {
+        return jdbcTemplate.queryForObject("select id, original, translate, person_id, mark, status from dictionary" +
+                        " where person_id = ? and STATUS = ? ORDER BY random() LIMIT 1",
+                dictionaryRowMapper, personId, status);
+    }
+
+    @Override
+    public void setUnPassedByPerson(Person person) {
+        jdbcTemplate.update("update dictionary set status = ? where status = ? and person_id = ?",
+                DictionaryItemStatus.READY, DictionaryItemStatus.PASSED, person.getId());
     }
 }

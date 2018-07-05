@@ -7,7 +7,8 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.asmirnov.engbot.db.domain.Person;
-import ru.asmirnov.engbot.db.domain.PersonStatus;
+import ru.asmirnov.engbot.enums.DictionaryItemType;
+import ru.asmirnov.engbot.enums.PersonStatus;
 import ru.asmirnov.engbot.db.repository.PersonRepository;
 import ru.asmirnov.engbot.util.JdbsUtils;
 
@@ -26,6 +27,7 @@ public class PersonJdbcRepositoryImpl implements PersonRepository {
             .extId(rs.getLong(2))
             .status(PersonStatus.valueOf(rs.getString(3)))
             .currentDictionaryItemId(JdbsUtils.getLong(rs.getLong(4), rs.wasNull()))
+            .currentDictionaryItemType(rs.getString(5) != null ? DictionaryItemType.valueOf(rs.getString(5)) : null)
             .build();
 
     @Autowired
@@ -39,9 +41,9 @@ public class PersonJdbcRepositoryImpl implements PersonRepository {
         boolean insert = person.getId() == null;
 
         if (insert) {
-            q = "insert into person (ext_id, status, curr_dict_item_id) VALUES (?,?,?)";
+            q = "insert into person (ext_id, status, curr_dict_item_id, curr_dict_item_type) VALUES (?,?,?,?)";
         } else {
-            q = "update person set ext_id = ?, status = ?, curr_dict_item_id = ? where id = ?";
+            q = "update person set ext_id = ?, status = ?, curr_dict_item_id = ?, curr_dict_item_type = ? where id = ?";
         }
 
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
@@ -51,8 +53,9 @@ public class PersonJdbcRepositoryImpl implements PersonRepository {
             ps.setObject(1, person.getExtId());
             ps.setString(2, person.getStatus().name());
             ps.setObject(3, person.getCurrentDictionaryItemId());
+            ps.setString(4, person.getCurrentDictionaryItemType() != null ? person.getCurrentDictionaryItemType().name() : null);
             if (!insert) {
-                ps.setLong(4, person.getId());
+                ps.setLong(5, person.getId());
             }
             return ps;
         }, generatedKeyHolder);
@@ -63,20 +66,20 @@ public class PersonJdbcRepositoryImpl implements PersonRepository {
 
     @Override
     public Person findById(Long id) {
-        return jdbcTemplate.queryForObject("select id, ext_id, status, curr_dict_item_id from person where id = ?",
+        return jdbcTemplate.queryForObject("select id, ext_id, status, curr_dict_item_id, curr_dict_item_type from person where id = ?",
                 personRowMapper);
     }
 
     @Override
     public List<Person> findAll() {
-        return jdbcTemplate.query("select id, ext_id, status, curr_dict_item_id from person",
+        return jdbcTemplate.query("select id, ext_id, status, curr_dict_item_id, curr_dict_item_type from person",
                 personRowMapper);
     }
 
     @Override
     public Person findByExtId(Long extId) {
         try {
-            return jdbcTemplate.queryForObject("select id, ext_id, status, curr_dict_item_id from person where ext_id = ?",
+            return jdbcTemplate.queryForObject("select id, ext_id, status, curr_dict_item_id, curr_dict_item_type from person where ext_id = ?",
                     personRowMapper, extId);
         } catch (EmptyResultDataAccessException e) {
             return null;

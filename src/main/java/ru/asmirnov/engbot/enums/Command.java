@@ -1,11 +1,12 @@
-package ru.asmirnov.engbot.db.domain;
+package ru.asmirnov.engbot.enums;
 
 import java.util.stream.Stream;
 
 public enum Command {
 
     ADD("/add"),
-    START("/start");
+    START("/start"),
+    STOP("/stop");
 
     private String cmd;
 

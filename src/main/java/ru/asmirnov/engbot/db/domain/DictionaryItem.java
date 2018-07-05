@@ -1,5 +1,8 @@
 package ru.asmirnov.engbot.db.domain;
 
+import ru.asmirnov.engbot.enums.DictionaryItemMark;
+import ru.asmirnov.engbot.enums.DictionaryItemStatus;
+
 import java.time.LocalDateTime;
 
 /**
@@ -13,14 +16,17 @@ public class DictionaryItem {
     private String translate;
     private Long userId;
     private DictionaryItemMark mark;
+    private DictionaryItemStatus status;
 
-    public DictionaryItem(Long id, LocalDateTime created, String original, String translate, Long userId, DictionaryItemMark mark) {
+    public DictionaryItem(Long id, LocalDateTime created, String original, String translate, Long userId,
+                          DictionaryItemMark mark, DictionaryItemStatus status) {
         this.id = id;
         this.created = created;
         this.original = original;
         this.translate = translate;
         this.userId = userId;
         this.mark = mark;
+        this.status = status;
     }
 
     public Long getId() {
@@ -72,6 +78,14 @@ public class DictionaryItem {
         this.created = created;
     }
 
+    public DictionaryItemStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DictionaryItemStatus status) {
+        this.status = status;
+    }
+
 
     public static final class DictionaryItemBuilder {
         private Long id;
@@ -80,6 +94,7 @@ public class DictionaryItem {
         private String translate;
         private Long userId;
         private DictionaryItemMark mark;
+        private DictionaryItemStatus status;
 
         private DictionaryItemBuilder() {
         }
@@ -118,8 +133,13 @@ public class DictionaryItem {
             return this;
         }
 
+        public DictionaryItemBuilder status(DictionaryItemStatus status) {
+            this.status = status;
+            return this;
+        }
+
         public DictionaryItem build() {
-            return new DictionaryItem(id, created, original, translate, userId, mark);
+            return new DictionaryItem(id, created, original, translate, userId, mark, status);
         }
     }
 }

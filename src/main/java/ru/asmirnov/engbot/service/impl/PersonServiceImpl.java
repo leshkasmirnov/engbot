@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.asmirnov.engbot.db.domain.DictionaryItem;
 import ru.asmirnov.engbot.db.domain.Person;
-import ru.asmirnov.engbot.db.domain.PersonStatus;
+import ru.asmirnov.engbot.enums.PersonStatus;
 import ru.asmirnov.engbot.db.repository.DictionaryItemRepository;
 import ru.asmirnov.engbot.db.repository.PersonRepository;
 import ru.asmirnov.engbot.service.PersonService;

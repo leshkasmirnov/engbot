@@ -4,12 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Message;
-import ru.asmirnov.engbot.db.domain.Command;
 import ru.asmirnov.engbot.db.domain.Person;
-import ru.asmirnov.engbot.db.domain.PersonStatus;
 import ru.asmirnov.engbot.db.repository.PersonRepository;
+import ru.asmirnov.engbot.enums.Command;
+import ru.asmirnov.engbot.enums.PersonStatus;
 import ru.asmirnov.engbot.service.CommandService;
-import ru.asmirnov.engbot.service.PersonService;
 
 import java.util.ResourceBundle;
 
@@ -37,8 +36,13 @@ public class CommandServiceImpl implements CommandService {
         } else if (Command.START == command) {
             person.setStatus(PersonStatus.ONLINE);
             personRepository.save(person);
-            return null;//statusService.processStatus(person, message);
+            // start training
+            return new SendMessage(message.getChatId(), resourceBundle.getString("answers.start"));
+        } else if (Command.STOP == command) {
+            // stop training
+            person.setStatus(PersonStatus.ACTIVE);
+            personRepository.save(person);
         }
-        return null;
+        throw new UnsupportedOperationException("Processing command " + command + " haven't realized yet");
     }
 }
