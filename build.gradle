@@ -28,6 +28,10 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.8'
 }
 
+bootJar {
+    launchScript()
+}
+
 dependencies {
     compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
     compile("org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}")
