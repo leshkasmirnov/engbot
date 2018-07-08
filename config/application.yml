@@ -14,3 +14,5 @@ spring:
       minimum-idle: 3
   liquibase:
     change-log: classpath:liquibase/changelog-master.yml
+logging:
+  config: file:config/logback.xml
