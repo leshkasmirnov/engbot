@@ -9,10 +9,14 @@ env:
   - secure: cUQGvN/7y36ykLJjnriok7qY94UvZlnqW0lUL4CeM29aaf/oz2YvXYLMu6msmt0eb1h1xa5SKZcXPRTj7SFPGCvT1fjt7IwNzncdNEQe3UOFnKHJU7BGbDFrZko1Mz8+Ugul4phjGK+CwZAMzwYa5pR8e2xJPXFuIG8Vn8sef73PZLgwpwjmJJETDdxqRRpg5ZjAUMMKAbu9DkjF2iN3HELWc9+jWjjmoucnkbrDSonYZkpxqXDAwrSKASuND00ykD+ZtKEZECgr2yxposmrufC3gPFbix9/hPYLZcBV77Kg8j6hfHd33k/Lc+lyJdKkq9kw9PYJhwrZAoapnCBjzkkbsBmqbr+Fkimp7r4S6WMgBGErak9ZXodsSVXDKZf4EmLB6Ldq6LDQXiEq31n6hoAz3bt5pAJxTKrRvTN6stUfI82y/FyadQYTva0SUD2J07lXs/wA8JjnA0HrvRQRDM339RXza6ss/i3y6KvxsLL8BKYm5hrMuNGxWfH8BaGdav4s8V2urUltN0D3UcioYmScomJuyHnhQ8UWfKefu6HitGNRQr4KorYLRalSbOEXlbi6zXOnahvNSD6pmVCvT+jMyGCHWkqGsw84ImGrJMx/DiYN/D/coWe3PJ16FFZ7dIfDm9lgChubvuGnsIs0o8wO0TtEaGAzvnj0+x7HHIE=
   - COMMIT=${TRAVIS_COMMIT::7}
 
+cache:
+  directories:
+    - '$HOME/.m2/repository'
+
 after_success:
 - docker login -u $DOCKER_USER -p $DOCKER_PASS
 - export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_BRANCH; fi`
-- export IMAGE_NAME=leshkasmirnov/eng_bot
+- export IMAGE_NAME=eng_bot/eng_bot
 - docker build -t $IMAGE_NAME:$COMMIT .
 - docker tag $IMAGE_NAME:$COMMIT $IMAGE_NAME:$TAG
 - docker push $IMAGE_NAME
