@@ -1,0 +1,7 @@
+version: '3'
+services:
+    engbot:
+        build: .
+        restart: always
+        volumes:
+        - /opt/engbot/logs:/app/logs
