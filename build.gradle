@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id "java"
     id "idea"
@@ -23,10 +25,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = "4.8.1"
 }
 
-//bootJar {
-//    launchScript()
-//}
-
 dependencies {
     compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
     compile("org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}")
@@ -37,4 +35,13 @@ dependencies {
     compile group: "ch.qos.logback", name: "logback-classic", version: "1.2.3"
 
     testCompile group: "junit", name: "junit", version: "4.12"
+}
+
+task prepareConfig(type: Copy) {
+    into "config"
+    from("template") {
+        include "application-production.yml"
+        // does not work as tokenValue is still null when this is evaluated
+        filter(ReplaceTokens, tokens: ['BOT_TOKEN': System.env.BOT_TOKEN])
+    }
 }

@@ -4,4 +4,4 @@
 /out/
 /logs/
 /config/application-dev.yml
-application-production.yml
+/config/application-production.yml
