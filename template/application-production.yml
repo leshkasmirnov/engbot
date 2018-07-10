@@ -5,8 +5,8 @@ spring:
     datasource:
         driver-class-name: org.postgresql.Driver
         url: jdbc:postgresql://localhost:5432/eng_bot
-        username: 12323
-        password: 12321321
+        username: @DATASOURCE_USER@
+        password: @DATASOURCE_PASSWORD@
         hikari:
             connection-init-sql: SELECT 1
             pool-name: EngBotDbPool

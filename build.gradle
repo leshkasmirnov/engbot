@@ -41,7 +41,8 @@ task prepareConfig(type: Copy) {
     into "config"
     from("template") {
         include "application-production.yml"
-        // does not work as tokenValue is still null when this is evaluated
-        filter(ReplaceTokens, tokens: ['BOT_TOKEN': System.env.BOT_TOKEN])
+        filter(ReplaceTokens, tokens: ['BOT_TOKEN'          : System.env.BOT_TOKEN,
+                                       'DATASOURCE_USER'    : System.env.DATASOURCE_USER,
+                                       'DATASOURCE_PASSWORD': System.env.DATASOURCE_PASSWORD])
     }
 }
