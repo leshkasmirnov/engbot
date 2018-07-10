@@ -1,5 +1,5 @@
 engbot:
-    token: null
+    token: ${BOT_TOKEN}
 #username: define your username here. By default: EngHelper
 spring:
     datasource:
