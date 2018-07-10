@@ -6,7 +6,7 @@ COPY ./build/libs/engbot-1.0-SNAPSHOT.jar /app/
 CMD ["mkdir", "/app/config"]
 
 COPY ./config/logback.xml /app/config/
-COPY ./config/application.yml /app/config/
+COPY ./config/application-production.yml /app/config/application.yml
 
 WORKDIR "/app"
 CMD ["java", "-Xmx256m", "-jar", "engbot-1.0-SNAPSHOT.jar"]
