@@ -16,8 +16,7 @@ cache:
 
 after_success:
 - docker login -u $DOCKER_USER -p $DOCKER_PASS
-- export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_COMMIT; fi`
 - export IMAGE_NAME=leshkasmirnov/eng_bot
-- docker build -t $IMAGE_NAME:$COMMIT .
-- docker tag $IMAGE_NAME:$COMMIT $IMAGE_NAME:$TAG
+- docker build -t $IMAGE_NAME .
+- docker tag $IMAGE_NAME
 - docker push $IMAGE_NAME
